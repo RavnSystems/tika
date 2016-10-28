@@ -17,6 +17,12 @@
 
 package org.apache.tika.parser.rtf;
 
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.*;
+import org.apache.tika.sax.XHTMLContentHandler;
+import org.apache.tika.utils.CharsetUtils;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -26,12 +32,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.exception.TikaException;
@@ -135,6 +136,11 @@ final class TextExtractor {
     // character set:
     private static final Map<Integer, Charset> ANSICPG_MAP =
             new HashMap<Integer, Charset>();
+
+    // count how many lists are open
+    private int openLists = 0;
+    // make sure we close <p> with </p> and same for li
+    private final Stack<Boolean> parInList = new Stack<Boolean>();
 
     static {
         FCHARSET_MAP.put(0, WINDOWS_1252); // ANSI
@@ -500,7 +506,7 @@ final class TextExtractor {
     private void parseHexChar(PushbackInputStream in) throws IOException, SAXException, TikaException {
         int hex1 = in.read();
         if (!isHexChar(hex1)) {
-            // DOC ERROR (malformed hex escape): ignore 
+            // DOC ERROR (malformed hex escape): ignore
             in.unread(hex1);
             return;
         }
@@ -585,9 +591,12 @@ final class TextExtractor {
             if (inList() && pendingListEnd != groupState.list) {
                 startList(groupState.list);
             }
+            // emit element and store in stack what element type it was
             if (inList()) {
+                parInList.push(true);
                 out.startElement("li");
             } else {
+                parInList.push(false);
                 out.startElement("p");
             }
 
@@ -617,14 +626,21 @@ final class TextExtractor {
                 end("b");
                 groupState.bold = preserveStyles;
             }
-            if (inList()) {
+            // close an element based on what we opened, rather than on inList() which may have changed since we opened the tag
+            if (parInList.pop()) {
                 out.endElement("li");
             } else {
                 out.endElement("p");
             }
 
             if (preserveStyles && (groupState.bold || groupState.italic)) {
-                start("p");
+                if (inList()) {
+                    parInList.push(true);
+                    out.startElement("li");
+                } else {
+                    parInList.push(false);
+                    out.startElement("p");
+                }
                 if (groupState.bold) {
                     start("b");
                 }
@@ -985,7 +1001,11 @@ final class TextExtractor {
      */
     private void endList(int listID) throws IOException, SAXException, TikaException {
         if (!ignoreLists) {
-            out.endElement(isUnorderedList(listID) ? "ul" : "ol");
+            // only end a list which has been opened
+            if(openLists > 0) {
+                openLists--;
+                out.endElement(isUnorderedList(listID) ? "ul" : "ol");
+            }
         }
     }
 
@@ -1000,6 +1020,8 @@ final class TextExtractor {
      */
     private void startList(int listID) throws IOException, SAXException, TikaException {
         if (!ignoreLists) {
+            // increment number of open lists
+            openLists++;
             out.startElement(isUnorderedList(listID) ? "ul" : "ol");
         }
     }
