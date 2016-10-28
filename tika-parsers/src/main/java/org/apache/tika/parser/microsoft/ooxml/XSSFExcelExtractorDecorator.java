@@ -407,6 +407,7 @@ public class XSSFExcelExtractorDecorator extends AbstractOOXMLExtractor {
             try {
                 xhtml.startElement("tr");
             } catch (SAXException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -414,6 +415,7 @@ public class XSSFExcelExtractorDecorator extends AbstractOOXMLExtractor {
             try {
                 xhtml.endElement("tr");
             } catch (SAXException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -437,6 +439,7 @@ public class XSSFExcelExtractorDecorator extends AbstractOOXMLExtractor {
 
                 xhtml.endElement("td");
             } catch (SAXException e) {
+                throw new RuntimeException(e);
             }
         }
 
