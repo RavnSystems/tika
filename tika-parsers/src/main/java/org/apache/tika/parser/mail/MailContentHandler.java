@@ -18,6 +18,8 @@ package org.apache.tika.parser.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -31,6 +33,7 @@ import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.field.ContentDispositionFieldLenientImpl;
 import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
@@ -59,22 +62,27 @@ class MailContentHandler implements ContentHandler {
     private Metadata metadata;
     private EmbeddedDocumentExtractor extractor;
 
-    private boolean inPart = false;
+    //helpers
+    Map<String, Integer> attachmentNameCount;
+    private boolean inBodyPart = false;
+    private String bodyPartName;
 
     MailContentHandler(XHTMLContentHandler xhtml, Metadata metadata, ParseContext context, boolean strictParsing) {
         this.handler = xhtml;
         this.metadata = metadata;
         this.strictParsing = strictParsing;
-
         // Fetch / Build an EmbeddedDocumentExtractor with which
-        //  to handle/process the parts/attachments
+        // to handle/process the parts/attachments
 
         // Was an EmbeddedDocumentExtractor explicitly supplied?
         this.extractor = context.get(EmbeddedDocumentExtractor.class);
 
+        // store how many times we have seen an attachment name
+        this.attachmentNameCount = new HashMap<String, Integer>();
+
         // If there's no EmbeddedDocumentExtractor, then try using a normal parser
         // This will ensure that the contents are made available to the user, so
-        //  the see the text, but without fine-grained control/extraction
+        // the see the text, but without fine-grained control/extraction
         // (This also maintains backward compatibility with older versions!)
         if (this.extractor == null) {
             // If the user gave a parser, use that, if not the default
@@ -105,6 +113,19 @@ class MailContentHandler implements ContentHandler {
         submd.set(Metadata.CONTENT_TYPE, body.getMimeType());
         submd.set(Metadata.CONTENT_ENCODING, body.getCharset());
 
+
+        /*
+         * look up in our attachment to see if we have seen the name before
+         *   - if so, then append a count to the attachment name
+         */
+
+        int count = attachmentNameCount.get(bodyPartName) == null ? 0 : attachmentNameCount.get(bodyPartName);
+        String attachmentName = count == 0 ? bodyPartName : bodyPartName + " [" + count + "]";
+        attachmentNameCount.put(bodyPartName, ++count);
+
+        submd.set(Metadata.RESOURCE_NAME_KEY, attachmentName);
+        submd.set(Metadata.EMBEDDED_RELATIONSHIP_ID, attachmentName);
+
         try {
             if (extractor.shouldParseEmbedded(submd)) {
                 extractor.parseEmbedded(is, handler, submd, false);
@@ -118,6 +139,7 @@ class MailContentHandler implements ContentHandler {
         try {
             handler.endElement("p");
             handler.endElement("div");
+            inBodyPart = false;
         } catch (SAXException e) {
             throw new MimeException(e);
         }
@@ -143,7 +165,6 @@ class MailContentHandler implements ContentHandler {
     }
 
     public void endMultipart() throws MimeException {
-        inPart = false;
     }
 
     public void epilogue(InputStream is) throws MimeException, IOException {
@@ -152,13 +173,12 @@ class MailContentHandler implements ContentHandler {
     /**
      * Header for the whole message or its parts
      *
-     * @see http://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/parser/
-     * Field.html
-     */
+     **/
     public void field(Field field) throws MimeException {
         // inPart indicates whether these metadata correspond to the
         // whole message or its parts
-        if (inPart) {
+        if (inBodyPart) {
+            processPartField(field);
             return;
         }
 
@@ -206,6 +226,17 @@ class MailContentHandler implements ContentHandler {
         }
     }
 
+    private void processPartField(Field field) {
+        String fieldname = field.getName();
+
+        ParsedField parsedField = LenientFieldParser.getParser().parse(
+                field, DecodeMonitor.SILENT);
+
+        if (fieldname.equalsIgnoreCase("Content-Disposition")) {
+            bodyPartName = ((ContentDispositionFieldLenientImpl) parsedField).getFilename();
+        }
+    }
+
     private void processAddressList(ParsedField field, String addressListType,
                                     String metadataField) throws MimeException {
         AddressListField toField = (AddressListField) field;
@@ -248,6 +279,7 @@ class MailContentHandler implements ContentHandler {
         try {
             handler.startElement("div", "class", "email-entry");
             handler.startElement("p");
+            inBodyPart = true;
         } catch (SAXException e) {
             throw new MimeException(e);
         }
@@ -259,7 +291,6 @@ class MailContentHandler implements ContentHandler {
     }
 
     public void startMultipart(BodyDescriptor descr) throws MimeException {
-        inPart = true;
     }
 
     private String stripOutFieldPrefix(Field field, String fieldname) {
