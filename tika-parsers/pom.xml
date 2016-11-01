@@ -29,7 +29,11 @@
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>tika-parsers</artifactId>
+  <!-- RAVN: updated group, artifact and version names -->
+  <groupId>com.ravn.github</groupId>
+  <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
+  <version>001</version>
+
   <packaging>bundle</packaging>
   <name>Apache Tika parsers</name>
   <url>http://tika.apache.org/</url>
@@ -63,15 +67,15 @@
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>${project.version}</version>
+      <version>1.14</version>
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>${project.version}</version>
+      <version>1.14</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -222,8 +226,8 @@
       <version>1.5.1</version>
       <exclusions>
         <exclusion>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom</artifactId>
+          <groupId>org.jdom</groupId>
+          <artifactId>jdom</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -252,19 +256,19 @@
       <artifactId>junrar</artifactId>
       <version>0.7</version>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-rs-client</artifactId>
       <version>${cxf.version}</version>
     </dependency>
-    <!-- TIKA-2021: Tesseract OCR Parser dependencies, 
+    <!-- TIKA-2021: Tesseract OCR Parser dependencies,
     used for executing image processing script -->
-	<dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-exec</artifactId>
-	    <version>${commonsexec.version}</version>
-	    <scope>compile</scope>
-	</dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>${commonsexec.version}</version>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- Provided dependencies -->
     <dependency>
@@ -297,17 +301,17 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20140107</version>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.2.4</version>
-    </dependency>    
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
