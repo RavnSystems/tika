@@ -108,21 +108,11 @@ class MailContentHandler implements ContentHandler {
         // use a different metadata object
         // in order to specify the mime type of the
         // sub part without damaging the main metadata
-
         Metadata submd = new Metadata();
         submd.set(Metadata.CONTENT_TYPE, body.getMimeType());
         submd.set(Metadata.CONTENT_ENCODING, body.getCharset());
 
-
-        /*
-         * look up in our attachment to see if we have seen the name before
-         *   - if so, then append a count to the attachment name
-         */
-
-        int count = attachmentNameCount.get(bodyPartName) == null ? 0 : attachmentNameCount.get(bodyPartName);
-        String attachmentName = count == 0 ? bodyPartName : bodyPartName + " [" + count + "]";
-        attachmentNameCount.put(bodyPartName, ++count);
-
+        String attachmentName = getAttachmentName();
         submd.set(Metadata.RESOURCE_NAME_KEY, attachmentName);
         submd.set(Metadata.EMBEDDED_RELATIONSHIP_ID, attachmentName);
 
@@ -132,6 +122,22 @@ class MailContentHandler implements ContentHandler {
             }
         } catch (SAXException e) {
             throw new MimeException(e);
+        }
+    }
+
+    /*
+     * look up in our attachment map to see if we have seen the name before
+     *   - if so, then append a count to the attachment name
+     */
+    private String getAttachmentName() {
+        if (bodyPartName == null) {
+            return null;
+        } else {
+            String result;
+            int count = attachmentNameCount.get(bodyPartName) == null ? 0 : attachmentNameCount.get(bodyPartName);
+            result = count == 0 ? bodyPartName : bodyPartName + " [" + count + "]";
+            attachmentNameCount.put(bodyPartName, ++count);
+            return result;
         }
     }
 
@@ -287,7 +293,6 @@ class MailContentHandler implements ContentHandler {
 
     public void startHeader() throws MimeException {
         // TODO Auto-generated method stub
-
     }
 
     public void startMultipart(BodyDescriptor descr) throws MimeException {
