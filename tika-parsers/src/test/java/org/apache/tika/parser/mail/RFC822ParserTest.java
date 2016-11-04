@@ -387,10 +387,9 @@ public class RFC822ParserTest extends TikaTest {
         assertEquals(3, tracker.filenames.size());
         assertEquals(3, tracker.mediaTypes.size());
 
-        // No filenames available
         assertEquals(null, tracker.filenames.get(0));
         assertEquals(null, tracker.filenames.get(1));
-        assertEquals(null, tracker.filenames.get(2));
+        assertEquals("logo.gif", tracker.filenames.get(2));
         // Types are available
         assertEquals(MediaType.TEXT_PLAIN, tracker.mediaTypes.get(0));
         assertEquals(MediaType.TEXT_HTML, tracker.mediaTypes.get(1));
