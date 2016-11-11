@@ -31,7 +31,7 @@
 
     <!-- RAVN: change group, artifact and version names-->
     <groupId>com.ravn.github</groupId>
-    <artifactId>org.apache.tika.tika-parsers-1.11</artifactId>
+    <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
     <version>001</version>
 
   <packaging>bundle</packaging>

@@ -41,6 +41,7 @@ import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParsedField;
@@ -130,14 +131,15 @@ class MailContentHandler implements ContentHandler {
 
     private boolean strictParsing = false;
 
-    private XHTMLContentHandler handler;
-    private Metadata metadata;
-    private EmbeddedDocumentExtractor extractor;
+    private final XHTMLContentHandler handler;
+    private final Metadata metadata;
+    private final EmbeddedDocumentExtractor extractor;
+    private final RFC822ParserConfig config;
 
     //helpers
     Map<String, Integer> attachmentNameCount;
     private boolean inBodyPart = false;
-    private String bodyPartName;
+    private ContentDispositionField contentDispositionField;
 
     MailContentHandler(XHTMLContentHandler xhtml, Metadata metadata, ParseContext context, boolean strictParsing) {
         this.handler = xhtml;
@@ -147,16 +149,13 @@ class MailContentHandler implements ContentHandler {
         // to handle/process the parts/attachments
 
         // Was an EmbeddedDocumentExtractor explicitly supplied?
-        this.extractor = context.get(EmbeddedDocumentExtractor.class);
-
-        // store how many times we have seen an attachment name
-        this.attachmentNameCount = new HashMap<String, Integer>();
+        EmbeddedDocumentExtractor extractor = context.get(EmbeddedDocumentExtractor.class);
 
         // If there's no EmbeddedDocumentExtractor, then try using a normal parser
         // This will ensure that the contents are made available to the user, so
         // the see the text, but without fine-grained control/extraction
         // (This also maintains backward compatibility with older versions!)
-        if (this.extractor == null) {
+        if (extractor == null) {
             // If the user gave a parser, use that, if not the default
             Parser parser = context.get(AutoDetectParser.class);
             if (parser == null) {
@@ -171,12 +170,43 @@ class MailContentHandler implements ContentHandler {
             }
             ParseContext ctx = new ParseContext();
             ctx.set(Parser.class, parser);
-            extractor = new ParsingEmbeddedDocumentExtractor(ctx);
+            this.extractor = new ParsingEmbeddedDocumentExtractor(ctx);
+        } else {
+            this.extractor = extractor;
         }
+
+        /*
+         * Check if the client has configured a RFC822ParserConfig object
+         * If so use it, else use the default one
+         */
+        RFC822ParserConfig config = context.get(RFC822ParserConfig.class);
+        if (config == null) {
+            this.config = new RFC822ParserConfig();
+        } else {
+            this.config = config;
+        }
+
+        // store how many times we have seen an attachment name
+        this.attachmentNameCount = new HashMap<String, Integer>();
     }
 
     public void body(BodyDescriptor body, InputStream is) throws MimeException,
             IOException {
+
+        if (!config.isPlainTextBody()) {
+            parse(body, is);
+        } else if (contentDispositionField != null && contentDispositionField.isAttachment()) {
+            parse(body, is);
+        } else if ( (contentDispositionField == null || contentDispositionField.isInline())
+                && body.getSubType().equals("plain") ) {
+            parse(body, is);
+        } else {
+            //ignore
+        }
+
+    }
+
+    private void parse(BodyDescriptor body, InputStream is) throws IOException, MimeException {
         // use a different metadata object
         // in order to specify the mime type of the
         // sub part without damaging the main metadata
@@ -184,7 +214,8 @@ class MailContentHandler implements ContentHandler {
         submd.set(Metadata.CONTENT_TYPE, body.getMimeType());
         submd.set(Metadata.CONTENT_ENCODING, body.getCharset());
 
-        String attachmentName = getAttachmentName();
+        String bodyPartName = contentDispositionField == null ? null : contentDispositionField.getFilename();
+        String attachmentName = getAttachmentName(bodyPartName);
         submd.set(Metadata.RESOURCE_NAME_KEY, attachmentName);
         submd.set(Metadata.EMBEDDED_RELATIONSHIP_ID, attachmentName);
 
@@ -204,7 +235,7 @@ class MailContentHandler implements ContentHandler {
      * look up in our attachment map to see if we have seen the name before
      *   - if so, then append a count to the attachment name
      */
-    private String getAttachmentName() {
+    private String getAttachmentName(String bodyPartName) {
         if (bodyPartName == null) {
             return null;
         } else {
@@ -353,7 +384,7 @@ class MailContentHandler implements ContentHandler {
                 field, DecodeMonitor.SILENT);
 
         if (fieldname.equalsIgnoreCase("Content-Disposition")) {
-            bodyPartName = ((ContentDispositionFieldLenientImpl) parsedField).getFilename();
+            this.contentDispositionField = (ContentDispositionFieldLenientImpl) parsedField;
         }
     }
 

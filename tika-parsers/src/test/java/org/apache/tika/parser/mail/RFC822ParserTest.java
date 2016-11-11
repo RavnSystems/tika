@@ -518,7 +518,7 @@ public class RFC822ParserTest extends TikaTest {
         // Check we go the metadata
         assertEquals("Tika Test <XXXX@apache.org>", metadata.get(Metadata.MESSAGE_FROM));
         assertEquals("Test Attachment Email", metadata.get(TikaCoreProperties.TITLE));
-        
+
         // Try again with attachment detecting and fetching
         final Detector detector = new DefaultDetector();
         final Parser extParser = new AutoDetectParser();
@@ -529,13 +529,13 @@ public class RFC822ParserTest extends TikaTest {
             public boolean shouldParseEmbedded(Metadata metadata) {
                 return true;
             }
-            
+
             @Override
             public void parseEmbedded(InputStream stream, ContentHandler handler,
                     Metadata metadata, boolean outputHtml) throws SAXException,
                     IOException {
                 seenTypes.add( detector.detect(stream, metadata) );
-                
+
                 ContentHandler h = new BodyContentHandler();
                 try {
                     extParser.parse(stream, h, metadata, new ParseContext());
@@ -550,16 +550,42 @@ public class RFC822ParserTest extends TikaTest {
         try (InputStream stream = getStream("test-documents/testEmailWithPNGAtt.eml")) {
             p.parse(stream, handler, metadata, context);
         }
-        
+
         // Check we go the metadata
         assertEquals("Tika Test <XXXX@apache.org>", metadata.get(Metadata.MESSAGE_FROM));
         assertEquals("Test Attachment Email", metadata.get(TikaCoreProperties.TITLE));
-        
+
         // Check attachments
         assertEquals(2, seenTypes.size());
         assertEquals(2, seenText.size());
         assertEquals("text/plain", seenTypes.get(0).toString());
         assertEquals("image/png", seenTypes.get(1).toString());
         assertEquals("This email has a PNG attachment included in it\n\n", seenText.get(0));
+    }
+
+    @Test
+    public void testPlainTextBodyOption() throws Exception {
+        Parser parser = new RFC822Parser();
+        Metadata metadata = new Metadata();
+        ContentHandler handler = new BodyContentHandler();
+        ParseContext context = new ParseContext();
+
+        RFC822ParserConfig config = new RFC822ParserConfig();
+
+        //enable the plain text body option
+        config.plainTextBody();
+        context.set(RFC822ParserConfig.class, config);
+
+        try (TikaInputStream stream = TikaInputStream.get(getStream("test-documents/testRFC822-multipart_alternative"))) {
+            try {
+                parser.parse(stream, handler, metadata, context);
+
+                String bodyText = handler.toString();
+                assertTrue(bodyText.contains("plain"));
+                assertFalse(bodyText.contains("html"));
+            } catch (Exception e) {
+                fail("Exception thrown: " + e.getMessage());
+            }
+        }
     }
 }
