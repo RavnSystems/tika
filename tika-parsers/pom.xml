@@ -30,9 +30,9 @@
         <relativePath>../tika-parent/pom.xml</relativePath>
     </parent>
 
-    <!-- RAVN: change group, artifact and version names-->
+    <!-- RAVN: updated group, artifact and version names -->
     <groupId>com.ravn.github</groupId>
-    <artifactId>org.apache.tika.tika-parsers-1.11</artifactId>
+    <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
     <version>003</version>
 
     <packaging>bundle</packaging>
@@ -40,8 +40,6 @@
     <url>http://tika.apache.org/</url>
 
     <properties>
-        <tika.version>1.11</tika.version> <!-- RAVN: set the tika version we are patching here -->
-
         <poi.version>3.13</poi.version>
         <!-- NOTE: sync codec version with POI -->
         <codec.version>1.9</codec.version>
@@ -56,15 +54,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>${tika.version}</version>
+            <groupId>com.ravn.github</groupId>
+            <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+            <version>001</version>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>${tika.version}</version>
+            <groupId>com.ravn.github</groupId>
+            <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+            <version>001</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

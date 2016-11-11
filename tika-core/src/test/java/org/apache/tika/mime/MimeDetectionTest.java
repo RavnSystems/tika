@@ -76,9 +76,13 @@ public class MimeDetectionTest {
         testFile("image/cgm", "plotutils-bin-cgm-v3.cgm");
         // test HTML detection of malformed file, previously identified as image/cgm (TIKA-1170)
         testFile("text/html", "test-malformed-header.html.bin");
-        
+
         //test GCMD Directory Interchange Format (.dif) TIKA-1561
         testFile("application/dif+xml", "brwNIMS_2014.dif");
+
+        //test RFC822 detection
+        testFile("message/rfc822", "test-rfc822-mozilla.eml");
+        testFile("message/rfc822", "test-rfc822-exchange.eml");
     }
 
     @Test
@@ -161,12 +165,12 @@ public class MimeDetectionTest {
             assertEquals(urlOrFileName + " is not properly detected after adding resource name.", expected, mime);
         } finally {
             in.close();
-        }        
+        }
     }
 
     private void assertNotNull(String string, InputStream in) {
       // TODO Auto-generated method stub
-      
+
     }
 
     /**
@@ -222,22 +226,22 @@ public class MimeDetectionTest {
      *  right one based on the glob, or the first one we
      *  come across if not. See TIKA-1292 for more details.
      */
-    @Test    
+    @Test
     public void testMimeMagicClashSamePriority() throws IOException {
         byte[] helloWorld = "Hello, World!".getBytes(UTF_8);
         MediaType helloType = MediaType.parse("hello/world-file");
         MediaType helloXType = MediaType.parse("hello/x-world-hello");
         Metadata metadata;
-        
+
         // With a filename, picks the right one
         metadata = new Metadata();
         metadata.set(Metadata.RESOURCE_NAME_KEY, "test.hello.world");
         assertEquals(helloType, mimeTypes.detect(new ByteArrayInputStream(helloWorld), metadata));
-        
+
         metadata = new Metadata();
         metadata.set(Metadata.RESOURCE_NAME_KEY, "test.x-hello-world");
         assertEquals(helloXType, mimeTypes.detect(new ByteArrayInputStream(helloWorld), metadata));
-        
+
         // Without, goes for the one that sorts last
         metadata = new Metadata();
         metadata.set(Metadata.RESOURCE_NAME_KEY, "testingTESTINGtesting");

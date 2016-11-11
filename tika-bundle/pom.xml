@@ -131,7 +131,7 @@
               poi,poi-scratchpad,poi-ooxml,poi-ooxml-schemas,
               xmlbeans,
               jackcess,
-              commons-lang,              
+              commons-lang,
               tagsoup,
               asm,
               juniversalchardet,
