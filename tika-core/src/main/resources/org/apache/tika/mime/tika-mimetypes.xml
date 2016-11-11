@@ -60,7 +60,7 @@
 	  <sub-class-of type="application/xml"/>
    </mime-type>
 
-  
+
   <mime-type type="application/atom+xml">
     <root-XML localName="feed" namespaceURI="http://purl.org/atom/ns#"/>
     <root-XML localName="feed" namespaceURI="http://www.w3.org/2005/Atom"/>
@@ -1695,7 +1695,7 @@
     <_comment>Outlook Personal Folders File Format</_comment>
     <magic priority="50">
        <match value="!BDN....SM" type="string" offset="0" mask="0xFFFFFFFF00000000FFFF"/>
-    </magic> 
+    </magic>
     <glob pattern="*.pst"/>
     <glob pattern="*.ost"/>
   </mime-type>
@@ -3322,7 +3322,7 @@
 	 <glob pattern="*.grb1"/>
 	 <glob pattern="*.grb2"/>
   </mime-type>
-  
+
   <mime-type type="application/x-gtar">
     <_comment>GNU tar Compressed File Archive (GNU Tape Archive)</_comment>
     <magic priority="50">
@@ -3536,7 +3536,7 @@
   </mime-type>
 
   <mime-type type="application/x-ms-installer">
-    <_comment>Microsoft Windows Installer</_comment> 
+    <_comment>Microsoft Windows Installer</_comment>
     <sub-class-of type="application/x-tika-msoffice"/>
     <alias type="application/x-windows-installer"/>
     <alias type="application/x-msi"/>
@@ -3732,7 +3732,7 @@
     <glob pattern="*.xquery"/>
     <sub-class-of type="text/plain"/>
   </mime-type>
-  
+
   <mime-type type="application/x-rar-compressed">
     <_comment>RAR archive</_comment>
     <alias type="application/x-rar"/>
@@ -5405,13 +5405,14 @@
       <match value="N#!\ rnews" type="string" offset="0"/>
       <match value="Forward\ to" type="string" offset="0"/>
       <match value="Pipe\ to" type="string" offset="0"/>
-      <match value="Return-Path:" type="stringignorecase" offset="0"/>
+      <match value="Return-Path:" type="stringignorecase" offset="0:1000"/>
       <match value="From:" type="stringignorecase" offset="0"/>
-      <match value="Received:" type="stringignorecase" offset="0"/>
-      <match value="Message-ID:" type="stringignorecase" offset="0"/>
+      <match value="Received:" type="stringignorecase" offset="0:1000"/>
+      <match value="Message-ID:" type="stringignorecase" offset="0:1000"/>
       <match value="Date:" type="string" offset="0"/>
       <match value="User-Agent:" type="string" offset="0"/>
       <match value="MIME-Version:" type="stringignorecase" offset="0"/>
+      <match value="Subject:" type="string" offset="0"/>
       <match value="X-Notes-Item:" type="string" offset="0">
         <match value="Message-ID:" type="string" offset="0:8192"/>
       </match>
@@ -6154,7 +6155,7 @@
     <!-- <glob pattern="*.m"/> - conflicts with text/x-objcsrc -->
     <sub-class-of type="text/plain"/>
   </mime-type>
-  
+
   <mime-type type="application/x-matlab-data">
     <comment>MATLAB data file</comment>
     <alias type="application/matlab-mat"/>

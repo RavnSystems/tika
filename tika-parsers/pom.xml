@@ -29,9 +29,9 @@
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
 
-    <!-- RAVN: change group, artifact and version names-->
+    <!-- RAVN: updated group, artifact and version names-->
     <groupId>com.ravn.github</groupId>
-    <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
+    <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
     <version>001</version>
 
   <packaging>bundle</packaging>
@@ -67,15 +67,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>1.14</version>
+      <groupId>com.ravn.github</groupId>
+      <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+      <version>001</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>1.14</version>
+      <groupId>com.ravn.github</groupId>
+      <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+      <version>001</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
