@@ -72,7 +72,7 @@ public class RFC822Parser extends AbstractParser {
                 xhtml, metadata, context, config.isStrictParsing());
         parser.setContentHandler(mch);
         parser.setContentDecoding(true);
-        
+
         TikaInputStream tstream = TikaInputStream.get(stream);
         try {
             parser.parse(tstream);

@@ -1,0 +1,48 @@
+Received: from EXCHANGE-DEV.DEV02.COM ([fe80::44a6:f21c:43a5:8d01]) by
+ EXCHANGE-DEV.DEV02.COM ([fe80::44a6:f21c:43a5:8d01%12]) with mapi id
+ 14.03.0319.002; Tue, 8 Nov 2016 18:03:59 +0000
+From: Administrator <Administrator@dev02.com>
+To: Administrator <Administrator@dev02.com>
+Subject: Greetings to myself!
+Thread-Topic: Greetings to myself!
+Thread-Index: AdI56niSc1lNFiFbQpSQHb7RpyESGA==
+Date: Tue, 8 Nov 2016 18:03:59 +0000
+Message-ID:
+ <D42074E38159A240B66EDBE62DCB5B2B015AB28BEE@EXCHANGE-DEV.DEV02.COM>
+Accept-Language: en-GB, it-IT, en-US
+Content-Language: en-GB
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: EXCHANGE-DEV.DEV02.COM
+X-MS-Has-Attach:
+X-MS-Exchange-Organization-SCL: -1
+X-MS-TNEF-Correlator:
+Content-Type: multipart/alternative;
+	boundary="_000_D42074E38159A240B66EDBE62DCB5B2B015AB28BEEEXCHANGEDEVDE_"
+MIME-Version: 1.0
+
+--_000_D42074E38159A240B66EDBE62DCB5B2B015AB28BEEEXCHANGEDEVDE_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Text specific to the plain text body
+
+--_000_D42074E38159A240B66EDBE62DCB5B2B015AB28BEEEXCHANGEDEVDE_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html dir=3D"ltr">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style id=3D"owaParaStyle" type=3D"text/css">P {margin-top:0;margin-bottom:=
+0;}</style>
+</head>
+<body ocsi=3D"0" fpstyle=3D"1">
+<div style=3D"direction: ltr;font-family: Tahoma;color: #000000;font-size: =
+10pt;">Text specific to the html body<br>
+</div>
+</body>
+</html>
+
+--_000_D42074E38159A240B66EDBE62DCB5B2B015AB28BEEEXCHANGEDEVDE_--

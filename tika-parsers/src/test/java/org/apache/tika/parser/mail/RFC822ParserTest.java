@@ -380,4 +380,30 @@ public class RFC822ParserTest extends TikaTest {
         assertEquals(MediaType.TEXT_HTML, tracker.mediaTypes.get(1));
         assertEquals(MediaType.image("gif"), tracker.mediaTypes.get(2));
     }
+
+    @Test
+    public void testPlainTextBodyOption() throws Exception {
+        Parser parser = new RFC822Parser();
+        Metadata metadata = new Metadata();
+        ContentHandler handler = new BodyContentHandler();
+        ParseContext context = new ParseContext();
+
+        RFC822ParserConfig config = new RFC822ParserConfig();
+
+        //enable the plain text body option
+        config.plainTextBody();
+        context.set(RFC822ParserConfig.class, config);
+
+        try (TikaInputStream stream = TikaInputStream.get(getStream("test-documents/testRFC822-multipart_alternative"))) {
+            try {
+                parser.parse(stream, handler, metadata, context);
+
+                String bodyText = handler.toString();
+                assertTrue(bodyText.contains("plain"));
+                assertFalse(bodyText.contains("html"));
+            } catch (Exception e) {
+                fail("Exception thrown: " + e.getMessage());
+            }
+        }
+    }
 }
