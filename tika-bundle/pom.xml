@@ -29,7 +29,11 @@
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>tika-bundle</artifactId>
+  <!-- RAVN: change group, artifact and version names-->
+  <groupId>com.ravn.github</groupId>
+  <artifactId>org.apache.tika.tika-bundle-${project.parent.version}</artifactId>
+  <version>001</version>
+
   <packaging>bundle</packaging>
   <name>Apache Tika OSGi bundle</name>
   <description>
@@ -46,15 +50,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.ravn.github</groupId>
+      <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+      <version>001</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tika-parsers</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
+      <groupId>com.ravn.github</groupId>
+      <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
+      <version>001</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -159,7 +162,6 @@
               !junit.*,
               !org.apache.ctakes.*,
               !org.apache.uima.*,
-              *,
               org.apache.tika.fork,
               android.util;resolution:=optional,
               com.adobe.xmp;resolution:=optional,
@@ -263,7 +265,8 @@
               org.xml.sax.helpers;resolution:=optional,
               org.xmlpull.v1;resolution:=optional,
               com.microsoft.schemas.office.powerpoint;resolution:=optional,
-              com.microsoft.schemas.office.word;resolution:=optional,              sun.misc;resolution:=optional,
+              com.microsoft.schemas.office.word;resolution:=optional,
+              sun.misc;resolution:=optional,
               ucar.units;resolution:=optional,
               ucar.httpservices;resolution:=optional,
               ucar.nc2.util;resolution:=optional,
@@ -349,7 +352,8 @@
               org.apache.http.message;resolution:=optional,
               org.apache.http.params;resolution:=optional,
               org.apache.http.protocol;resolution:=optional,
-              org.apache.http.util;resolution:=optional
+              org.apache.http.util;resolution:=optional,
+              *
             </Import-Package>
           </instructions>
         </configuration>
@@ -440,4 +444,4 @@
     <system>Jenkins</system>
     <url>https://builds.apache.org/job/Tika-trunk/</url>
   </ciManagement>
-</project>  
+</project>
