@@ -58,6 +58,7 @@
       <groupId>com.ravn.github</groupId>
       <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
       <version>001</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- Test dependencies -->
