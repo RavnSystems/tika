@@ -32,7 +32,7 @@
   <!-- RAVN: change group, artifact and version names-->
   <groupId>com.ravn.github</groupId>
   <artifactId>org.apache.tika.tika-bundle-${project.parent.version}</artifactId>
-  <version>001</version>
+  <version>002</version>
 
   <packaging>bundle</packaging>
   <name>Apache Tika OSGi bundle</name>
@@ -362,6 +362,28 @@
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <!-- Copy the services resources into the packaging area -->
+          <execution>
+            <id>copy-services-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.ravn.github</groupId>
+                  <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <includes>META-INF/services/*</includes>
+                  <outputDirectory>
+                    ${project.build.directory}/maven-shared-archive-resources
+                  </outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
           <execution>
             <phase>prepare-package</phase>
             <goals>
