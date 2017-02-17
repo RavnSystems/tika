@@ -108,7 +108,7 @@ public class TesseractOCRParser extends AbstractParser {
     public Set<MediaType> getSupportedTypes(ParseContext context) {
         // If Tesseract is installed, offer our supported image types
         TesseractOCRConfig config = context.get(TesseractOCRConfig.class, DEFAULT_CONFIG);
-        if (hasTesseract(config)) {
+        if (config.isEnabled() && hasTesseract(config)) {
             if (! HAS_ALERTED) {
                 LOG.info("Tesseract OCR is installed and will be automatically applied to image files.\n"+
                         "This may dramatically slow down content extraction (TIKA-2359).\n"+

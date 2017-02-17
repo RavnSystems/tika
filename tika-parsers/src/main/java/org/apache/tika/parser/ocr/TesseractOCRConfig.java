@@ -41,10 +41,11 @@ public class TesseractOCRConfig implements Serializable {
 
     private static final long serialVersionUID = -4861942486845757891L;
 
-    public enum OUTPUT_TYPE {
-        TXT,
-        HOCR
-    }
+	public enum OUTPUT_TYPE {
+		TXT,
+		HOCR;
+	}// Tesseract parser enabled by default
+	private boolean enabled = true;
 
     // Path to tesseract installation folder, if not on system path.
     private String tesseractPath = "";
@@ -172,12 +173,25 @@ public class TesseractOCRConfig implements Serializable {
 
     }
 
-    /**
-     * @see #setTesseractPath(String tesseractPath)
-     */
-    public String getTesseractPath() {
-        return tesseractPath;
-    }
+	/*** @see #setEnabled(boolean enabled)*/
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	/**
+	 * Enable or disable this parser. Default is enabled.
+	 *
+	 * You may wish to disable this parser if you have Tesseract
+	 * installed on your system but do not require its services.
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/** @see #setTesseractPath(String tesseractPath)*/
+	public String getTesseractPath() {
+		return tesseractPath;
+	}
 
     /**
      * Set the path to the Tesseract executable, needed if it is not on system path.

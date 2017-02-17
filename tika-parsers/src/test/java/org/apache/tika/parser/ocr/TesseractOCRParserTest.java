@@ -56,6 +56,31 @@ public class TesseractOCRParserTest extends TikaTest {
     }
 
     /*
+    Check that if Tesseract is found, the TesseractOCRParser can be disabled
+    in config
+    */
+    @Test
+    public void offersNoTypesIfTesseractDisabled() throws Exception {
+        TesseractOCRParser parser = new TesseractOCRParser();
+        DefaultParser defaultParser = new DefaultParser();
+        MediaType png = MediaType.image("png");
+
+        assumeTrue(canRun());
+
+        TesseractOCRConfig config = new TesseractOCRConfig();
+        config.setEnabled(false);
+
+        ParseContext parseContext = new ParseContext();
+        parseContext.set(TesseractOCRConfig.class, config);
+
+        // No types offered
+        assertEquals(0, parser.getSupportedTypes(parseContext).size());
+
+        // And DefaultParser won't use us
+        assertEquals(ImageParser.class, defaultParser.getParsers(parseContext).get(png).getClass());
+    }
+
+    /*
     Check that if Tesseract is not found, the TesseractOCRParser claims to not support
     any file types. So, the standard image parser is called instead.
      */
