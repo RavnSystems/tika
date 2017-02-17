@@ -31,8 +31,22 @@
 
   <!-- RAVN: change group, artifact and version names-->
   <groupId>com.ravn.github</groupId>
-  <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
+  <artifactId>org.apache.tika.tika-core-1.14</artifactId>
   <version>001</version>
+
+  <!-- RAVN: distribution config -->
+  <distributionManagement>
+    <repository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-releases</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-releases-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-snapshots</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-snapshots-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <packaging>bundle</packaging>
   <name>Apache Tika core</name>

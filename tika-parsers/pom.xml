@@ -29,10 +29,24 @@
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
 
-    <!-- RAVN: updated group, artifact and version names-->
-    <groupId>com.ravn.github</groupId>
-    <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
-    <version>002-SNAPSHOT</version>
+  <!-- RAVN: updated group, artifact and version names-->
+  <groupId>com.ravn.github</groupId>
+  <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
+  <version>002-SNAPSHOT</version>
+
+  <!-- RAVN: distribution config -->
+  <distributionManagement>
+    <repository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-releases</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-releases-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-snapshots</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-snapshots-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <packaging>bundle</packaging>
   <name>Apache Tika parsers</name>
