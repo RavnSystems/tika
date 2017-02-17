@@ -32,7 +32,7 @@
     <!-- RAVN: updated group, artifact and version names-->
     <groupId>com.ravn.github</groupId>
     <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
-    <version>001</version>
+    <version>002-SNAPSHOT</version>
 
   <packaging>bundle</packaging>
   <name>Apache Tika parsers</name>
