@@ -105,7 +105,7 @@ public class TesseractOCRParser extends AbstractParser {
     public Set<MediaType> getSupportedTypes(ParseContext context) {
         // If Tesseract is installed, offer our supported image types
         TesseractOCRConfig config = context.get(TesseractOCRConfig.class, DEFAULT_CONFIG);
-        if (hasTesseract(config))
+        if (config.isEnabled() && hasTesseract(config))
             return SUPPORTED_TYPES;
 
         // Otherwise don't advertise anything, so the other image parsers
