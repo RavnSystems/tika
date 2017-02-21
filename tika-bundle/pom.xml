@@ -71,7 +71,7 @@
     <dependency>
       <groupId>com.ravn.github</groupId>
       <artifactId>org.apache.tika.tika-parsers-${project.parent.version}</artifactId>
-      <version>002-SNAPSHOT</version>
+      <version>004-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>
 
