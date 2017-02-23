@@ -82,14 +82,14 @@
 
     <dependency>
       <groupId>com.ravn.github</groupId>
-      <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
-      <version>001</version>
+      <artifactId>org.apache.tika.tika-core-1.14</artifactId>
+      <version>004-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.ravn.github</groupId>
-      <artifactId>org.apache.tika.tika-core-${project.parent.version}</artifactId>
-      <version>001</version>
+      <artifactId>org.apache.tika.tika-core-1.14</artifactId>
+      <version>004-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
