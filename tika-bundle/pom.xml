@@ -32,7 +32,7 @@
   <!-- RAVN: change group, artifact and version names-->
   <groupId>com.ravn.github</groupId>
   <artifactId>org.apache.tika.tika-bundle-1.14</artifactId>
-  <version>004</version>
+  <version>005-SNAPSHOT</version>
 
   <!-- RAVN: distribution config -->
   <distributionManagement>
@@ -66,12 +66,12 @@
     <dependency>
       <groupId>com.ravn.github</groupId>
       <artifactId>org.apache.tika.tika-core-1.14</artifactId>
-      <version>004</version>
+      <version>005-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.ravn.github</groupId>
       <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
-      <version>004</version>
+      <version>005-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>
 
