@@ -25,14 +25,9 @@
   <parent>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parent</artifactId>
-    <version>1.14</version>
+    <version>1.14-ravn-001-SNAPSHOT</version>
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
-
-  <!-- RAVN: change group, artifact and version names-->
-  <groupId>com.ravn.github</groupId>
-  <artifactId>org.apache.tika.tika-bundle-1.14</artifactId>
-  <version>005-SNAPSHOT</version>
 
   <!-- RAVN: distribution config -->
   <distributionManagement>
@@ -48,6 +43,7 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <artifactId>tika-bundle</artifactId>
   <packaging>bundle</packaging>
   <name>Apache Tika OSGi bundle</name>
   <description>
@@ -64,14 +60,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.ravn.github</groupId>
-      <artifactId>org.apache.tika.tika-core-1.14</artifactId>
-      <version>005-SNAPSHOT</version>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.ravn.github</groupId>
-      <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
-      <version>005-SNAPSHOT</version>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
+      <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
 
@@ -170,6 +166,8 @@
               !org.apache.tika.parser,
               !org.apache.tika.parser.external,
               org.apache.tika.parser.*,
+              org.apache.james.*,
+              org.apache.poi.*,
             </Export-Package>
             <Import-Package>
               !org.junit,
@@ -387,8 +385,8 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.ravn.github</groupId>
-                  <artifactId>org.apache.tika.tika-parsers-1.14</artifactId>
+                  <groupId>org.apache.tika</groupId>
+                  <artifactId>tika-parsers</artifactId>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <includes>META-INF/services/*</includes>

@@ -25,14 +25,9 @@
   <parent>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parent</artifactId>
-    <version>1.14</version>
+    <version>1.14-ravn-001-SNAPSHOT</version>
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
-
-  <!-- RAVN: change group, artifact and version names-->
-  <groupId>com.ravn.github</groupId>
-  <artifactId>org.apache.tika.tika-core-1.14</artifactId>
-  <version>005-SNAPSHOT</version>
 
   <!-- RAVN: distribution config -->
   <distributionManagement>
@@ -48,6 +43,7 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <artifactId>tika-core</artifactId>
   <packaging>bundle</packaging>
   <name>Apache Tika core</name>
   <url>http://tika.apache.org/</url>
