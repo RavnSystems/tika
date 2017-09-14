@@ -29,20 +29,6 @@
     <relativePath>../tika-parent/pom.xml</relativePath>
   </parent>
 
-  <!-- RAVN: distribution config -->
-  <distributionManagement>
-    <repository>
-      <id>mavn.ravn.co.uk</id>
-      <name>mavn.ravn.co.uk-releases</name>
-      <url>https://mavn.ravn.co.uk/artifactory/libs-releases-local</url>
-    </repository>
-    <snapshotRepository>
-      <id>mavn.ravn.co.uk</id>
-      <name>mavn.ravn.co.uk-snapshots</name>
-      <url>https://mavn.ravn.co.uk/artifactory/libs-snapshots-local</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <artifactId>tika-bundle</artifactId>
   <packaging>bundle</packaging>
   <name>Apache Tika OSGi bundle</name>
