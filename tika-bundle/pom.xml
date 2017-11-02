@@ -249,6 +249,8 @@
               !org.apache.tika.parser.external,
               org.apache.tika.parser.*,
 	      org.apache.tika.metadata.serialization.*,
+              org.apache.james.*,
+              org.apache.poi.*,
             </Export-Package>
             <Import-Package>
               !org.junit,
