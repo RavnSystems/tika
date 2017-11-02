@@ -21,6 +21,7 @@ import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaConfigException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -35,6 +36,7 @@ import static org.junit.Assert.*;
 /**
  * Test case for {@link SentimentParser}
  */
+@Ignore
 public class SentimentParserTest {
 
     @Test
