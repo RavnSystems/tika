@@ -38,7 +38,7 @@ import org.apache.tika.config.ServiceLoader;
 public class DefaultEncodingDetector extends CompositeEncodingDetector {
 
     public DefaultEncodingDetector() {
-        this(new ServiceLoader(DefaultEncodingDetector.class.getClassLoader()));
+        this(new ServiceLoader());
     }
 
     public DefaultEncodingDetector(ServiceLoader loader) {
