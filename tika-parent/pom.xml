@@ -441,4 +441,18 @@
     <url>https://github.com/apache/tika</url>
     <tag>1.17-rc2</tag>
   </scm>
+
+  <!-- RAVN: distribution config -->
+  <distributionManagement>
+    <repository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-releases</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-releases-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>mavn.ravn.co.uk</id>
+      <name>mavn.ravn.co.uk-snapshots</name>
+      <url>https://mavn.ravn.co.uk/artifactory/libs-snapshots-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
