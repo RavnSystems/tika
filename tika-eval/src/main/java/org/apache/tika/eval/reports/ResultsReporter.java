@@ -40,6 +40,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.poi.common.usermodel.Hyperlink;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.tika.eval.ExtractComparer;
 import org.apache.tika.eval.ExtractProfiler;
 import org.apache.tika.eval.db.H2Util;
@@ -181,7 +182,7 @@ public class ResultsReporter {
                 if (baseNode != null) {
                     base = baseNode.getNodeValue();
                 }
-                XLSXHREFFormatter f = new XLSXHREFFormatter(base, Hyperlink.LINK_URL);
+                XLSXHREFFormatter f = new XLSXHREFFormatter(base, HyperlinkType.URL);
                 ret.put(columnName, f);
             } else if ("fileLink".equals(type)) {
                 String base = "";
@@ -189,7 +190,7 @@ public class ResultsReporter {
                 if (baseNode != null) {
                     base = baseNode.getNodeValue();
                 }
-                XLSXHREFFormatter f = new XLSXHREFFormatter(base, Hyperlink.LINK_FILE);
+                XLSXHREFFormatter f = new XLSXHREFFormatter(base, HyperlinkType.FILE);
                 ret.put(columnName, f);
             }
         }
