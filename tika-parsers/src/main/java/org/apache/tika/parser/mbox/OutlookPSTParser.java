@@ -127,7 +127,7 @@ public class OutlookPSTParser extends AbstractParser {
                 //RecursiveParserWrapper copies the metadata and thereby prevents
                 //modifications to mailMetadata from making it into the
                 //metadata objects cached by the RecursiveParserWrapper
-                parseMailAttachments(handler, pstMail, mailMetadata, embeddedExtractor);
+                parseMailAttachments(handler, pstMail, mailMetadata, embeddedExtractor, pstMail.getInternetMessageId());
                 parserMailItem(handler, pstMail, mailMetadata, embeddedExtractor);
 
                 handler.endElement("div");
@@ -215,16 +215,22 @@ public class OutlookPSTParser extends AbstractParser {
         //that causes the HTMLParser to get the encoding wrong.  Better if we could get
         //the underlying bytes from the pstMail object...
 
-        byte[] mailContent = pstMail.getBody().getBytes(UTF_8);
-        mailMetadata.set(TikaCoreProperties.CONTENT_TYPE_OVERRIDE,
-                MediaType.TEXT_PLAIN.toString());
-        embeddedExtractor.parseEmbedded(new ByteArrayInputStream(mailContent),
-                handler, mailMetadata, true);
+        byte[] htmlContent = pstMail.getBodyHTML().getBytes(UTF_8);
+        byte[] plainContent = pstMail.getBody().getBytes(UTF_8);
+
+        //mailMetadata.set(TikaCoreProperties.CONTENT_TYPE_OVERRIDE, MediaType.TEXT_PLAIN.toString());
+        if (htmlContent.length > 0) {
+            embeddedExtractor.parseEmbedded(new ByteArrayInputStream(htmlContent), handler, mailMetadata, true);
+        } else {
+            mailMetadata.set(TikaCoreProperties.CONTENT_TYPE_OVERRIDE, MediaType.TEXT_PLAIN.toString());
+        embeddedExtractor.parseEmbedded(new ByteArrayInputStream(plainContent), handler, mailMetadata, true);
+        }
     }
 
     private void parseMailAttachments(XHTMLContentHandler xhtml, PSTMessage email,
-                                     final Metadata mailMetadata,
-                                      EmbeddedDocumentExtractor embeddedExtractor)
+                                      final Metadata mailMetadata,
+                                      EmbeddedDocumentExtractor embeddedExtractor,
+                                      final String messageId)
             throws TikaException {
         int numberOfAttachments = email.getNumberOfAttachments();
         for (int i = 0; i < numberOfAttachments; i++) {
@@ -265,7 +271,7 @@ public class OutlookPSTParser extends AbstractParser {
                 xhtml.endElement("div");
 
             } catch (Exception e) {
-                EmbeddedDocumentUtil.recordEmbeddedStreamException(e, mailMetadata);
+                throw new TikaException("Unable to unpack document stream", e);
             }
         }
     }
