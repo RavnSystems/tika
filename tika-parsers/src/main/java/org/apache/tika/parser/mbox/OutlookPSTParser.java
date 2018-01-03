@@ -17,41 +17,41 @@
 package org.apache.tika.parser.mbox;
 
 import static java.lang.String.valueOf;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singleton;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
-import com.pff.PSTAttachment;
-import com.pff.PSTException;
 import com.pff.PSTFile;
 import com.pff.PSTFolder;
 import com.pff.PSTMessage;
-import com.pff.PSTRecipient;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.extractor.EmbeddedDocumentUtil;
+import org.apache.tika.io.IOUtils;
 import org.apache.tika.io.TikaInputStream;
-import org.apache.tika.metadata.Message;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.Office;
-import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.AbstractParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.microsoft.OutlookExtractor;
+
 import org.apache.tika.sax.XHTMLContentHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import javax.mail.internet.MimeMessage;
 
 /**
  * Parser for MS Outlook PST email storage files
  */
 public class OutlookPSTParser extends AbstractParser {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutlookPSTParser.class);
 
     private static final long serialVersionUID = 620998217748364063L;
 
@@ -72,9 +72,6 @@ public class OutlookPSTParser extends AbstractParser {
     public void parse(InputStream stream, ContentHandler handler, Metadata metadata, ParseContext context)
             throws IOException, SAXException, TikaException {
 
-        // Use the delegate parser to parse the contained document
-        EmbeddedDocumentExtractor embeddedExtractor = EmbeddedDocumentUtil.getEmbeddedDocumentExtractor(context);
-
         metadata.set(Metadata.CONTENT_TYPE, MS_OUTLOOK_PST_MIMETYPE.toString());
 
         XHTMLContentHandler xhtml = new XHTMLContentHandler(handler, metadata);
@@ -91,6 +88,9 @@ public class OutlookPSTParser extends AbstractParser {
                 throw new TikaException("OST 2013 support not added yet. It will be when https://github.com/rjohnsondev/java-libpst/issues/60 is fixed.");
             }
             if (isValid) {
+                // Use the delegate parser to parse the contained document
+                EmbeddedDocumentExtractor embeddedExtractor = EmbeddedDocumentUtil.getEmbeddedDocumentExtractor(context);
+
                 parseFolder(xhtml, pstFile.getRootFolder(), embeddedExtractor);
             }
         } catch (TikaException e) {
@@ -121,14 +121,8 @@ public class OutlookPSTParser extends AbstractParser {
                 handler.startElement("div", attributes);
                 handler.element("h1", pstMail.getSubject());
 
-                final Metadata mailMetadata = new Metadata();
-                //parse attachments first so that stream exceptions
-                //in attachments can make it into mailMetadata.
-                //RecursiveParserWrapper copies the metadata and thereby prevents
-                //modifications to mailMetadata from making it into the
-                //metadata objects cached by the RecursiveParserWrapper
-                parseMailAttachments(handler, pstMail, mailMetadata, embeddedExtractor, pstMail.getInternetMessageId());
-                parserMailItem(handler, pstMail, mailMetadata, embeddedExtractor);
+                // parse the message
+                parserMailItem(handler, pstMail, embeddedExtractor);
 
                 handler.endElement("div");
 
@@ -146,133 +140,33 @@ public class OutlookPSTParser extends AbstractParser {
         }
     }
 
-    private void parserMailItem(XHTMLContentHandler handler, PSTMessage pstMail, Metadata mailMetadata,
-                                EmbeddedDocumentExtractor embeddedExtractor) throws SAXException, IOException {
-        mailMetadata.set(Metadata.RESOURCE_NAME_KEY, pstMail.getInternetMessageId());
-        mailMetadata.set(Metadata.EMBEDDED_RELATIONSHIP_ID, pstMail.getInternetMessageId());
-        mailMetadata.set(TikaCoreProperties.IDENTIFIER, pstMail.getInternetMessageId());
-        mailMetadata.set(TikaCoreProperties.TITLE, pstMail.getSubject());
-        mailMetadata.set(Metadata.MESSAGE_FROM, pstMail.getSenderName());
-        mailMetadata.set(TikaCoreProperties.CREATOR, pstMail.getSenderName());
-        mailMetadata.set(TikaCoreProperties.CREATED, pstMail.getCreationTime());
-        mailMetadata.set(Office.MAPI_MESSAGE_CLIENT_SUBMIT_TIME, pstMail.getClientSubmitTime());
-        mailMetadata.set(TikaCoreProperties.MODIFIED, pstMail.getLastModificationTime());
-        mailMetadata.set(TikaCoreProperties.COMMENTS, pstMail.getComment());
-        mailMetadata.set("descriptorNodeId", valueOf(pstMail.getDescriptorNodeId()));
-        mailMetadata.set("senderEmailAddress", pstMail.getSenderEmailAddress());
-        mailMetadata.set("recipients", pstMail.getRecipientsString());
-        mailMetadata.set("displayTo", pstMail.getDisplayTo());
-        mailMetadata.set("displayCC", pstMail.getDisplayCC());
-        mailMetadata.set("displayBCC", pstMail.getDisplayBCC());
-        mailMetadata.set("importance", valueOf(pstMail.getImportance()));
-        mailMetadata.set("priority", valueOf(pstMail.getPriority()));
-        mailMetadata.set("flagged", valueOf(pstMail.isFlagged()));
-        mailMetadata.set(Office.MAPI_MESSAGE_CLASS,
-                OutlookExtractor.getMessageClass(pstMail.getMessageClass()));
+    private void parserMailItem(XHTMLContentHandler handler, PSTMessage pstMail,
+                                EmbeddedDocumentExtractor embeddedExtractor) throws TikaException {
 
-        mailMetadata.set(Message.MESSAGE_FROM_EMAIL, pstMail.getSenderEmailAddress());
-
-        mailMetadata.set(Office.MAPI_FROM_REPRESENTING_EMAIL,
-                pstMail.getSentRepresentingEmailAddress());
-
-        mailMetadata.set(Message.MESSAGE_FROM_NAME, pstMail.getSenderName());
-        mailMetadata.set(Office.MAPI_FROM_REPRESENTING_NAME, pstMail.getSentRepresentingName());
-
-        //add recipient details
         try {
-            for (int i = 0; i < pstMail.getNumberOfRecipients(); i++) {
-                PSTRecipient recipient = pstMail.getRecipient(i);
-                switch (OutlookExtractor.RECIPIENT_TYPE.getTypeFromVal(recipient.getRecipientType())) {
-                    case TO:
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_TO_DISPLAY_NAME,
-                                recipient.getDisplayName(), mailMetadata);
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_TO_EMAIL,
-                                recipient.getEmailAddress(), mailMetadata);
-                        break;
-                    case CC:
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_CC_DISPLAY_NAME,
-                                recipient.getDisplayName(), mailMetadata);
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_CC_EMAIL,
-                                recipient.getEmailAddress(), mailMetadata);
-                        break;
-                    case BCC:
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_BCC_DISPLAY_NAME,
-                                recipient.getDisplayName(), mailMetadata);
-                        OutlookExtractor.addEvenIfNull(Message.MESSAGE_BCC_EMAIL,
-                                recipient.getEmailAddress(), mailMetadata);
-                        break;
-                    default:
-                        //do we want to handle unspecified or unknown?
-                        break;
-                }
-            }
-        } catch (PSTException e) {
-            //swallow
-        }
-        //we may want to experiment with working with the bodyHTML.
-        //However, because we can't get the raw bytes, we _could_ wind up sending
-        //a UTF-8 byte representation of the html that has a conflicting metaheader
-        //that causes the HTMLParser to get the encoding wrong.  Better if we could get
-        //the underlying bytes from the pstMail object...
+            MimeMessage message = MimeConverter.convertToMimeMessage(pstMail);
 
-        byte[] htmlContent = pstMail.getBodyHTML().getBytes(UTF_8);
-        byte[] plainContent = pstMail.getBody().getBytes(UTF_8);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        //mailMetadata.set(TikaCoreProperties.CONTENT_TYPE_OVERRIDE, MediaType.TEXT_PLAIN.toString());
-        if (htmlContent.length > 0) {
-            embeddedExtractor.parseEmbedded(new ByteArrayInputStream(htmlContent), handler, mailMetadata, true);
-        } else {
-            mailMetadata.set(TikaCoreProperties.CONTENT_TYPE_OVERRIDE, MediaType.TEXT_PLAIN.toString());
-        embeddedExtractor.parseEmbedded(new ByteArrayInputStream(plainContent), handler, mailMetadata, true);
-        }
-    }
-
-    private void parseMailAttachments(XHTMLContentHandler xhtml, PSTMessage email,
-                                      final Metadata mailMetadata,
-                                      EmbeddedDocumentExtractor embeddedExtractor,
-                                      final String messageId)
-            throws TikaException {
-        int numberOfAttachments = email.getNumberOfAttachments();
-        for (int i = 0; i < numberOfAttachments; i++) {
+            // configure the correct class loader to use in an OSGI context
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(MimeMessage.class.getClassLoader());
             try {
-                PSTAttachment attach = email.getAttachment(i);
-
-                // Get the filename; both long and short filenames can be used for attachments
-                String filename = attach.getLongFilename();
-                if (filename.isEmpty()) {
-                    filename = attach.getFilename();
-                }
-
-                xhtml.element("p", filename);
-
-                Metadata attachMeta = new Metadata();
-                attachMeta.set(Metadata.RESOURCE_NAME_KEY, filename);
-                attachMeta.set(Metadata.EMBEDDED_RELATIONSHIP_ID, filename);
-                AttributesImpl attributes = new AttributesImpl();
-                attributes.addAttribute("", "class", "class", "CDATA", "embedded");
-                attributes.addAttribute("", "id", "id", "CDATA", filename);
-                xhtml.startElement("div", attributes);
-                if (embeddedExtractor.shouldParseEmbedded(attachMeta)) {
-                    TikaInputStream tis = null;
-                    try {
-                        tis = TikaInputStream.get(attach.getFileInputStream());
-                    } catch (NullPointerException e) {//TIKA-2488
-                        EmbeddedDocumentUtil.recordEmbeddedStreamException(e, mailMetadata);
-                        continue;
-                    }
-
-                    try {
-                        embeddedExtractor.parseEmbedded(tis, xhtml, attachMeta, true);
-                    } finally {
-
-                        tis.close();
-                    }
-                }
-                xhtml.endElement("div");
-
-            } catch (Exception e) {
-                throw new TikaException("Unable to unpack document stream", e);
+                message.writeTo(output);
+            } finally {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
+
+            final Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, pstMail.getInternetMessageId());
+            metadata.set(Metadata.EMBEDDED_RELATIONSHIP_ID, pstMail.getInternetMessageId());
+
+            final String rfc822 = output.toString("UTF-8");
+            try (InputStream is = IOUtils.toInputStream(rfc822, "UTF-8")) {
+                embeddedExtractor.parseEmbedded(is, handler, metadata, false);
+            }
+        } catch (Throwable t) {
+            LOGGER.error("Failed to parse mail item", t);
         }
     }
 

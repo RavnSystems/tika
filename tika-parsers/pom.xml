@@ -422,6 +422,13 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- Used in the OutlookPSTParser -->
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.javax.mail</artifactId>
+      <version>1.4.1_5</version>
+    </dependency>
+
     <!-- Provided dependencies -->
     <dependency>
       <groupId>org.xerial</groupId>
