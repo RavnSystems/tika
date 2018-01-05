@@ -25,6 +25,7 @@ import java.util.Vector;
 public class MimeConverterTest {
 
     @Test
+    @Ignore
     public void test() {
         try {
             String inputPST = "..."; // input pst file
