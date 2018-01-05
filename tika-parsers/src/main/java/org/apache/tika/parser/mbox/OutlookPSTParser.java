@@ -33,10 +33,12 @@ import org.apache.tika.extractor.EmbeddedDocumentUtil;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Office;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.AbstractParser;
 import org.apache.tika.parser.ParseContext;
 
+import org.apache.tika.parser.microsoft.OutlookExtractor;
 import org.apache.tika.sax.XHTMLContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,6 +162,8 @@ public class OutlookPSTParser extends AbstractParser {
             final Metadata metadata = new Metadata();
             metadata.set(Metadata.RESOURCE_NAME_KEY, pstMail.getInternetMessageId());
             metadata.set(Metadata.EMBEDDED_RELATIONSHIP_ID, pstMail.getInternetMessageId());
+            metadata.set(Office.MAPI_MESSAGE_CLASS,
+                    OutlookExtractor.getMessageClass(pstMail.getMessageClass()));
 
             final String rfc822 = output.toString("UTF-8");
             try (InputStream is = IOUtils.toInputStream(rfc822, "UTF-8")) {
