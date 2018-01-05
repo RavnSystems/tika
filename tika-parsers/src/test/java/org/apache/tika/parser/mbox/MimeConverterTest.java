@@ -25,11 +25,10 @@ import java.util.Vector;
 public class MimeConverterTest {
 
     @Test
-    @Ignore
     public void test() {
         try {
-            String inputPST = "/home/bent/Downloads/massive.pst"; // input pst file
-            String outputDir = "/home/bent/Downloads/result"; // output directory
+            String inputPST = "..."; // input pst file
+            String outputDir = "..."; // output directory
 
             if (!Files.exists(Paths.get(inputPST))) {
                 throw new IOException("Could not find input pst file " + inputPST);
