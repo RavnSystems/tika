@@ -750,6 +750,10 @@
         </exclusion>
         <exclusion>
           <groupId>org.apache.tika</groupId>
+          <artifactId>tika-langdetect</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
           <artifactId>tika-batch</artifactId>
         </exclusion>
         <exclusion>
