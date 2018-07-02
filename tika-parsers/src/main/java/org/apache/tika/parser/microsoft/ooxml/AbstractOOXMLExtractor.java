@@ -50,6 +50,8 @@ import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.extractor.EmbeddedDocumentUtil;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Office;
+import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.microsoft.OfficeParser;
@@ -80,6 +82,7 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
     static final String RELATION_PACKAGE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/package";
     static final String RELATION_MACRO = "http://schemas.microsoft.com/office/2006/relationships/vbaProject";
     static final String RELATION_OFFICE_DOCUMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
+    static final String RELATION_COMMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments";
     private static final String TYPE_OLE_OBJECT =
             "application/vnd.openxmlformats-officedocument.oleObject";
 
@@ -254,7 +257,18 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
             } else if (RELATION_MACRO.equals(type)) {
                 handleMacros(target, handler);
             }
+
+
+        //Metadata flags for comments and annotations
+        if (target.getContentType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml")
+                || rel.getRelationshipType().equals(RELATION_COMMENT)){
+            parentMetadata.set(Office.COMMENTS_PRESENT.getName(), "true");
         }
+
+        if (target.getContentType().equals("application/inkml+xml")){
+            parentMetadata.set(Office.ANNOTATIONS_PRESENT.getName(), "true");
+        }
+    }
 
 
 
