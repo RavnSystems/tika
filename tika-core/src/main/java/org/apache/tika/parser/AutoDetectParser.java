@@ -29,6 +29,7 @@ import org.apache.tika.extractor.ParsingEmbeddedDocumentExtractor;
 import org.apache.tika.io.TemporaryResources;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Office;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MediaTypeRegistry;
 import org.apache.tika.sax.SecureContentHandler;
@@ -115,6 +116,12 @@ public class AutoDetectParser extends CompositeParser {
             // Automatically detect the MIME type of the document
             MediaType type = detector.detect(tis, metadata);
             metadata.set(Metadata.CONTENT_TYPE, type.toString());
+
+            // Create comment/annotation flag
+            metadata.set(Office.COMMENTS_PRESENT.getName(),"false");
+            metadata.set(Office.ANNOTATIONS_PRESENT.getName(), "false");
+
+
             //check for zero-byte inputstream
             if (tis.getOpenContainer() == null) {
                 tis.mark(1);
