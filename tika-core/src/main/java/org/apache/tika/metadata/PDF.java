@@ -67,6 +67,7 @@ public interface PDF {
 
     Property IS_ENCRYPTED = Property.internalBoolean(PDF_PREFIX+"encrypted");
 
+    Property HAS_COMMENTS_OR_ANNOTATIONS = Office.COMMENTS_OR_ANNOTATIONS;
     Property PRODUCER = Property.internalText(PDF_PREFIX+"producer");
 
     /**
