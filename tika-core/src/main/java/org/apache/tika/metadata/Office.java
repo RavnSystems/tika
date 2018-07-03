@@ -126,14 +126,8 @@ public interface Office {
     /**
      * Boolean flag to identify presence of comments within a document.
      */
-    Property COMMENTS_PRESENT = Property.internalBoolean(
-            PREFIX_DOC_META + Metadata.NAMESPACE_PREFIX_DELIMITER + "comments-present");
-
-    /**
-     * Boolean flag to identify presence of comments within a document.
-     */
-    Property ANNOTATIONS_PRESENT = Property.internalBoolean(
-            PREFIX_DOC_META + Metadata.NAMESPACE_PREFIX_DELIMITER + "annotations-present");
+    Property COMMENTS_OR_ANNOTATIONS = Property.internalBoolean(
+            PREFIX_DOC_META + Metadata.NAMESPACE_PREFIX_DELIMITER + "hasCommentsOrAnnotations");
 
     /**
      * MAPI message class.  What type of .msg/MAPI file is it?

@@ -18,6 +18,7 @@ package org.apache.tika.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.DefaultDetector;
@@ -117,10 +118,42 @@ public class AutoDetectParser extends CompositeParser {
             MediaType type = detector.detect(tis, metadata);
             metadata.set(Metadata.CONTENT_TYPE, type.toString());
 
-            // Create comment/annotation flag
-            metadata.set(Office.COMMENTS_PRESENT.getName(),"false");
-            metadata.set(Office.ANNOTATIONS_PRESENT.getName(), "false");
+            //holds all mediatypes that require the comment/annotation flag
+            Set<MediaType> supportedTypesForCommenting = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    MediaType.application("vnd.openxmlformats-officedocument.presentationml.presentation"),
+                    MediaType.application("vnd.ms-powerpoint.presentation.macroenabled.12"),
+                    MediaType.application("vnd.openxmlformats-officedocument.presentationml.template"),
+                    MediaType.application("vnd.openxmlformats-officedocument.presentationml.slideshow"),
+                    MediaType.application("vnd.ms-powerpoint.slideshow.macroenabled.12"),
+                    MediaType.application("vnd.ms-powerpoint.addin.macroenabled.12"),
+                    MediaType.application("vnd.ms-powerpoint.template.macroenabled.12"),
+                    MediaType.application("vnd.ms-powerpoint.slide.macroenabled.12"),
+                    MediaType.application("vnd.openxmlformats-officedocument.presentationml.slide"),
+                    MediaType.application("vnd.ms-powerpoint"),
 
+                    MediaType.application("vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                    MediaType.application("vnd.ms-excel.sheet.macroenabled.12"),
+                    MediaType.application("vnd.openxmlformats-officedocument.spreadsheetml.template"),
+                    MediaType.application("vnd.ms-excel.template.macroenabled.12"),
+                    MediaType.application("vnd.ms-excel.addin.macroenabled.12"),
+                    MediaType.application("vnd.ms-excel.sheet.binary.macroenabled.12"),
+                    MediaType.application("application/vnd.ms-excel"),
+
+
+                    MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.document"),
+                    MediaType.application("vnd.ms-word.document.macroenabled.12"),
+                    MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.template"),
+                    MediaType.application("vnd.ms-word.template.macroenabled.12"),
+                    MediaType.application("application/msword"),
+
+                    MediaType.application("pdf")
+                    )));
+
+            if (supportedTypesForCommenting.contains(type)){
+                // Create comment/annotation flag
+                //initialise comment metadata flag
+                metadata.set(Office.COMMENTS_OR_ANNOTATIONS.getName(),"false");
+            }
 
             //check for zero-byte inputstream
             if (tis.getOpenContainer() == null) {
