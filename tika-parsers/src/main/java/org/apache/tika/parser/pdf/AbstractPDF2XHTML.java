@@ -383,6 +383,7 @@ class AbstractPDF2XHTML extends PDFTextStripper {
                     }
 
                     if (annotation instanceof PDAnnotationMarkup) {
+                        metadata.set(PDF.HAS_COMMENTS_OR_ANNOTATIONS.getName(),"true");
                         PDAnnotationMarkup annotationMarkup = (PDAnnotationMarkup) annotation;
                         String title = annotationMarkup.getTitlePopup();
                         String subject = annotationMarkup.getSubject();

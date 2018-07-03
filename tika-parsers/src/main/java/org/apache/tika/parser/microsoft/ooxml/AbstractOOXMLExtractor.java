@@ -52,7 +52,6 @@ import org.apache.tika.extractor.EmbeddedDocumentUtil;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Office;
-import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.microsoft.OfficeParser;
@@ -272,18 +271,10 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
 
 
         //Metadata flags for comments and annotations
-        if (target.getContentType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml")
-                || rel.getRelationshipType().equals(RELATION_COMMENT)){
-            parentMetadata.set(Office.COMMENTS_PRESENT.getName(), "true");
-        }
-
-        if (target.getContentType().equals("application/inkml+xml")){
-            parentMetadata.set(Office.ANNOTATIONS_PRESENT.getName(), "true");
+        if (rel.getRelationshipType().equals(RELATION_COMMENT) || target.getContentType().equals("application/inkml+xml")) {
+            parentMetadata.set(Office.COMMENTS_OR_ANNOTATIONS.getName(), "true");
         }
     }
-
-
-
 
     /**
      * Handles an embedded OLE object in the document
