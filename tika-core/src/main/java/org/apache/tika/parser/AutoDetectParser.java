@@ -139,7 +139,6 @@ public class AutoDetectParser extends CompositeParser {
                     MediaType.application("vnd.ms-excel.sheet.binary.macroenabled.12"),
                     MediaType.application("application/vnd.ms-excel"),
 
-
                     MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.document"),
                     MediaType.application("vnd.ms-word.document.macroenabled.12"),
                     MediaType.application("vnd.openxmlformats-officedocument.wordprocessingml.template"),
