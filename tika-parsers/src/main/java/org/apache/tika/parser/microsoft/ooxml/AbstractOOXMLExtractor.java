@@ -271,6 +271,7 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
 
 
         //Metadata flags for comments and annotations
+        // application/inkml+xml is the MIME type for ink/drawn comments in Office
         if (rel.getRelationshipType().equals(RELATION_COMMENT) || target.getContentType().equals("application/inkml+xml")) {
             parentMetadata.set(Office.COMMENTS_OR_ANNOTATIONS.getName(), "true");
         }
