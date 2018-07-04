@@ -44,7 +44,7 @@ public class AutoDetectParser extends CompositeParser {
     //private final TikaConfig config;
 
     //holds all mediatypes that require the comment/annotation flag
-    private static final Set<MediaType> supportedTypesForCommenting = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+    private static final Set<MediaType> SUPPORTED_TYPES_FOR_COMMENTING = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             MediaType.application("vnd.openxmlformats-officedocument.presentationml.presentation"),
             MediaType.application("vnd.ms-powerpoint.presentation.macroenabled.12"),
             MediaType.application("vnd.openxmlformats-officedocument.presentationml.template"),
@@ -148,7 +148,7 @@ public class AutoDetectParser extends CompositeParser {
             MediaType type = detector.detect(tis, metadata);
             metadata.set(Metadata.CONTENT_TYPE, type.toString());
 
-            if (supportedTypesForCommenting.contains(type)){
+            if (SUPPORTED_TYPES_FOR_COMMENTING.contains(type)){
                 // Create comment/annotation flag
                 //initialise comment metadata flag
                 metadata.set(Office.COMMENTS_OR_ANNOTATIONS.getName(),"false");
