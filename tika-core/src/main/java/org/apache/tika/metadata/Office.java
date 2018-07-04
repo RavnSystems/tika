@@ -124,6 +124,12 @@ public interface Office {
           PREFIX_DOC_META + Metadata.NAMESPACE_PREFIX_DELIMITER + "object-count");
 
     /**
+     * Boolean flag to identify presence of comments within a document.
+     */
+    Property COMMENTS_OR_ANNOTATIONS = Property.internalBoolean(
+            PREFIX_DOC_META + Metadata.NAMESPACE_PREFIX_DELIMITER + "hasCommentsOrAnnotations");
+
+    /**
      * MAPI message class.  What type of .msg/MAPI file is it?
      */
     Property MAPI_MESSAGE_CLASS = Property.internalClosedChoise(
