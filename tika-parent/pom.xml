@@ -438,7 +438,7 @@
     <developerConnection>scm:git:https://github.com/apache/</developerConnection>
     <url>https://github.com/apache/tika</url>
     <tag>tika-1.15-ravn-005</tag>
-  </scm>F
+  </scm>
 
   <!-- RAVN: distribution config -->
   <distributionManagement>
