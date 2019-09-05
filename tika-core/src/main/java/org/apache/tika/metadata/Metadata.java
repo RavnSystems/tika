@@ -166,7 +166,7 @@ public class Metadata implements CreativeCommons, Geographic, HttpHeaders,
      */
     public String get(final String name) {
         String[] values = metadata.get(name);
-        if (values == null) {
+        if (values == null || values.length == 0) {
             return null;
         } else {
             return values[0];

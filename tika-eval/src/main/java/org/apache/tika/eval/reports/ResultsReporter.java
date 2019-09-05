@@ -40,6 +40,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.poi.common.usermodel.HyperlinkType;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.tika.eval.ExtractComparer;
 import org.apache.tika.eval.ExtractProfiler;
 import org.apache.tika.eval.db.H2Util;

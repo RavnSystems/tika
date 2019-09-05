@@ -65,6 +65,7 @@ public interface PDF {
 
     Property IS_ENCRYPTED = Property.internalBoolean(PDF_PREFIX+"encrypted");
 
+    Property HAS_COMMENTS_OR_ANNOTATIONS = Office.COMMENTS_OR_ANNOTATIONS;
     /**
      * This specifies where an action or destination would be found/triggered
      * in the document: on document open, before close, etc.

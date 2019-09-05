@@ -545,4 +545,18 @@
     <url>https://github.com/apache/tika</url>
     <tag>1.22-rc4</tag>
   </scm>
+
+  <!-- RAVN: distribution config -->
+  <distributionManagement>
+    <repository>
+      <id>artifactory.ravn.imanage.com</id>
+      <name>artifactory.ravn.imanage.com-releases</name>
+      <url>https://artifactory.ravn.imanage.com/artifactory/libs-releases-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>artifactory.ravn.imanage.com</id>
+      <name>artifactory.ravn.imanage.com-snapshots</name>
+      <url>https://artifactory.ravn.imanage.com/artifactory/libs-snapshots-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

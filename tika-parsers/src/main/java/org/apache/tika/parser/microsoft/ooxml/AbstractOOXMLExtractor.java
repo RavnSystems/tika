@@ -51,6 +51,7 @@ import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.extractor.EmbeddedDocumentUtil;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Office;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.microsoft.OfficeParser;
@@ -82,6 +83,7 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
     static final String RELATION_MEDIA = "http://schemas.microsoft.com/office/2007/relationships/media";
     static final String RELATION_VIDEO = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/video";
     static final String RELATION_DIAGRAM_DATA = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData";
+    static final String RELATION_COMMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments";
 
     private static final String TYPE_OLE_OBJECT =
             "application/vnd.openxmlformats-officedocument.oleObject";
@@ -266,11 +268,15 @@ public abstract class AbstractOOXMLExtractor implements OOXMLExtractor {
         } else if (XSSFRelation.VBA_MACROS.getRelation().equals(type)) {
             handleMacros(target, handler);
             handledTarget.add(targetURI.toString());
+            }
+
+
+        //Metadata flags for comments and annotations
+        // application/inkml+xml is the MIME type for ink/drawn comments in Office
+        if (rel.getRelationshipType().equals(RELATION_COMMENT) || target.getContentType().equals("application/inkml+xml")) {
+            parentMetadata.set(Office.COMMENTS_OR_ANNOTATIONS.getName(), "true");
         }
     }
-
-
-
 
     /**
      * Handles an embedded OLE object in the document
