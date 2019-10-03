@@ -7,6 +7,20 @@ Tika is a project of the [Apache Software Foundation](http://www.apache.org).
 
 Apache Tika, Tika, Apache, the Apache feather logo, and the Apache Tika project logo are trademarks of The Apache Software Foundation.
 
+iManage RAVN Changes
+--------------------
+- Patch XSSFExcelExtractorDecorator: Propagate SAXException's
+- Fix for parsing RTF files
+- Osgi: Export org.apache.james + poi in bundle
+- Fix exception when field doesn't have values
+- Add RAVN dist config
+- Outlook PST Parser: Alternate way of parsing PST Files:
+  - Traverse pst file, convert each mail item to a RFC822 file, then delegate to the RFC822 parser.
+  - Some of the tests in OutlookPSTParserTest fail because of the changes. Looks like mainly problems with the headers.
+- Create Office Metadata property COMMENT_OR_ANNOTATION
+
+All changes <https://github.com/apache/tika/compare/1.22...RavnSystems:1.22-ravn>
+
 Getting Started
 ---------------
 
@@ -19,7 +33,7 @@ The build consists of a number of components, including a standalone runnable ja
     java -jar tika-app/target/tika-app-*.jar --help
     
 Contributing via Github
-=======================
+-----------------------
 To contribute a patch, follow these instructions (note that installing
 [Hub](http://hub.github.com) is not strictly required, but is recommended).
 
