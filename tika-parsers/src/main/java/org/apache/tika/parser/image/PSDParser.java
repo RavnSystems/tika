@@ -16,23 +16,16 @@
  */
 package org.apache.tika.parser.image;
 
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.poi.util.IOUtils;
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.extractor.EmbeddedDocumentExtractor;
-import org.apache.tika.extractor.EmbeddedDocumentUtil;
 import org.apache.tika.io.EndianUtils;
-import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Photoshop;
 import org.apache.tika.metadata.TIFF;
@@ -40,7 +33,6 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.AbstractParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.image.xmp.JempboxExtractor;
 import org.apache.tika.sax.XHTMLContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -64,25 +56,22 @@ public class PSDParser extends AbstractParser {
     private static final long serialVersionUID = 883387734607994914L;
 
     private static final Set<MediaType> SUPPORTED_TYPES =
-            Collections.unmodifiableSet(new HashSet<MediaType>(Arrays.asList(
-                    MediaType.image("vnd.adobe.photoshop"))));
-
-    private static final int MAX_DATA_LENGTH_BYTES = 1000000;
-    private static final int MAX_BLOCKS = 10000;
+        Collections.unmodifiableSet(new HashSet<MediaType>(Arrays.asList(
+            MediaType.image("vnd.adobe.photoshop"))));
 
     public Set<MediaType> getSupportedTypes(ParseContext context) {
         return SUPPORTED_TYPES;
     }
 
     public void parse(
-            InputStream stream, ContentHandler handler,
-            Metadata metadata, ParseContext context)
-            throws IOException, SAXException, TikaException {
+        InputStream stream, ContentHandler handler,
+        Metadata metadata, ParseContext context)
+        throws IOException, SAXException, TikaException {
         // Check for the magic header signature
         byte[] signature = new byte[4];
-        IOUtils.readFully(stream, signature);
+        org.apache.poi.util.IOUtils.readFully(stream, signature);
         if (signature[0] == (byte) '8' && signature[1] == (byte) 'B' &&
-                signature[2] == (byte) 'P' && signature[3] == (byte) 'S') {
+            signature[2] == (byte) 'P' && signature[3] == (byte) 'S') {
             // Good, signature found
         } else {
             throw new TikaException("PSD/PSB magic signature invalid");
@@ -97,7 +86,7 @@ public class PSDParser extends AbstractParser {
         }
 
         // Skip the reserved block
-        IOUtils.readFully(stream, new byte[6]);
+        org.apache.poi.util.IOUtils.readFully(stream, new byte[6]);
 
         // Number of channels in the image
         int numChannels = EndianUtils.readUShortBE(stream);
@@ -115,27 +104,19 @@ public class PSDParser extends AbstractParser {
 
         // Colour mode, eg Bitmap or RGB
         int colorMode = EndianUtils.readUShortBE(stream);
-        if (colorMode < Photoshop._COLOR_MODE_CHOICES_INDEXED.length) {
-            metadata.set(Photoshop.COLOR_MODE, Photoshop._COLOR_MODE_CHOICES_INDEXED[colorMode]);
-        }
+        metadata.set(Photoshop.COLOR_MODE, Photoshop._COLOR_MODE_CHOICES_INDEXED[colorMode]);
 
         // Next is the Color Mode section
         // We don't care about this bit
         long colorModeSectionSize = EndianUtils.readIntBE(stream);
-        IOUtils.skipFully(stream, colorModeSectionSize);
+        stream.skip(colorModeSectionSize);
 
         // Next is the Image Resources section
         // Check for certain interesting keys here
         long imageResourcesSectionSize = EndianUtils.readIntBE(stream);
         long read = 0;
-        //if something is corrupt about this number, prevent an
-        //infinite loop by only reading 10000 blocks
-        int blocks = 0;
-        while (read < imageResourcesSectionSize && blocks < MAX_BLOCKS) {
+        while (read < imageResourcesSectionSize) {
             ResourceBlock rb = new ResourceBlock(stream);
-            if (rb.totalLength <= 0) {
-                //break;
-            }
             read += rb.totalLength;
 
             // Is it one we can do something useful with?
@@ -146,12 +127,8 @@ public class PSDParser extends AbstractParser {
             } else if (rb.id == ResourceBlock.ID_EXIF_3) {
                 // TODO Parse the EXIF info via ImageMetadataExtractor
             } else if (rb.id == ResourceBlock.ID_XMP) {
-                //if there are multiple xmps in a file, this will
-                //overwrite the data from the earlier xmp
-                JempboxExtractor ex = new JempboxExtractor(metadata);
-                ex.parse(new ByteArrayInputStream(rb.data));
+                // TODO Parse the XMP info via ImageMetadataExtractor
             }
-            blocks++;
         }
 
         // Next is the Layer and Mask Info
@@ -167,26 +144,22 @@ public class PSDParser extends AbstractParser {
     private static class ResourceBlock {
         private static final long SIGNATURE = 0x3842494d; // 8BIM
         private static final int ID_CAPTION = 0x03F0;
+        private static final int ID_URL = 0x040B;
         private static final int ID_EXIF_1 = 0x0422;
         private static final int ID_EXIF_3 = 0x0423;
         private static final int ID_XMP = 0x0424;
-        //TODO
-        private static final int ID_URL = 0x040B;
-        private static final int ID_AUTO_SAVE_FILE_PATH = 0x043E;
-        private static final int ID_THUMBNAIL_RESOURCE = 0x040C;
 
         private int id;
         private String name;
         private byte[] data;
         private int totalLength;
-        static int counter = 0;
+
         private ResourceBlock(InputStream stream) throws IOException, TikaException {
-            counter++;
             // Verify the signature
             long sig = EndianUtils.readIntBE(stream);
             if (sig != SIGNATURE) {
                 throw new TikaException("Invalid Image Resource Block Signature Found, got " +
-                        sig + " 0x" + Long.toHexString(sig) + " but the spec defines " + SIGNATURE);
+                    sig + " 0x" + Long.toHexString(sig) + " but the spec defines " + SIGNATURE);
             }
 
             // Read the block
@@ -196,9 +169,6 @@ public class PSDParser extends AbstractParser {
             int nameLen = 0;
             while (true) {
                 int v = stream.read();
-                if (v < 0) {
-                    throw new EOFException();
-                }
                 nameLen++;
 
                 if (v == 0) {
@@ -215,26 +185,16 @@ public class PSDParser extends AbstractParser {
             }
 
             int dataLen = EndianUtils.readIntBE(stream);
-            if (dataLen < 0) {
-                throw new TikaException("data length must be >= 0: "+dataLen);
-            }
             if (dataLen % 2 == 1) {
                 // Data Length is even padded
                 dataLen = dataLen + 1;
             }
-            //protect against overflow
-            if (Integer.MAX_VALUE-dataLen < nameLen+10) {
-                throw new TikaException("data length is too long:"+dataLen);
-            }
             totalLength = 4 + 2 + nameLen + 4 + dataLen;
+
             // Do we have use for the data segment?
             if (captureData(id)) {
-                if (dataLen > MAX_DATA_LENGTH_BYTES) {
-                    throw new TikaException("data length must be < "+MAX_DATA_LENGTH_BYTES+
-                            ": "+dataLen);
-                }
                 data = new byte[dataLen];
-                IOUtils.readFully(stream, data);
+                org.apache.poi.util.IOUtils.readFully(stream, data);
             } else {
                 data = new byte[0];
                 IOUtils.skipFully(stream, dataLen);

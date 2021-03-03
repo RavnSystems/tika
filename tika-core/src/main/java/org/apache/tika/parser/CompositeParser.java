@@ -262,14 +262,14 @@ public class CompositeParser extends AbstractParser {
      * honor the {@link Parser} contract.
      */
     public void parse(
-            InputStream stream, ContentHandler handler,
-            Metadata metadata, ParseContext context)
-            throws IOException, SAXException, TikaException {
+        InputStream stream, ContentHandler handler,
+        Metadata metadata, ParseContext context)
+        throws IOException, SAXException, TikaException {
         Parser parser = getParser(metadata, context);
         TemporaryResources tmp = new TemporaryResources();
         try {
             TikaInputStream taggedStream = TikaInputStream.get(stream, tmp);
-            TaggedContentHandler taggedHandler = 
+            TaggedContentHandler taggedHandler =
                 handler != null ? new TaggedContentHandler(handler) : null;
             if (parser instanceof ParserDecorator){
                 metadata.add("X-Parsed-By", ((ParserDecorator) parser).getWrappedParser().getClass().getName());
@@ -278,20 +278,17 @@ public class CompositeParser extends AbstractParser {
             }
             try {
                 parser.parse(taggedStream, taggedHandler, metadata, context);
-            } catch (SecurityException e) {
-                //rethrow security exceptions
-                throw e;
+            } catch (RuntimeException e) {
+                throw new TikaException(
+                    "Unexpected RuntimeException from " + parser, e);
             } catch (IOException e) {
                 taggedStream.throwIfCauseOf(e);
                 throw new TikaException(
-                        "TIKA-198: Illegal IOException from " + parser, e);
+                    "TIKA-198: Illegal IOException from " + parser, e);
             } catch (SAXException e) {
                 if (taggedHandler != null) taggedHandler.throwIfCauseOf(e);
                 throw new TikaException(
-                        "TIKA-237: Illegal SAXException from " + parser, e);
-            } catch (RuntimeException e) {
-                throw new TikaException(
-                        "Unexpected RuntimeException from " + parser, e);
+                    "TIKA-237: Illegal SAXException from " + parser, e);
             }
         } finally {
             tmp.dispose();
