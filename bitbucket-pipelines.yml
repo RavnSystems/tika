@@ -10,9 +10,8 @@ definitions:
         caches:
           - maven
         script:
-          - bash create-settings.sh
           # Skip tests as there are lots of test failures in Apache Tika project
-          - mvn -B -s settings.xml -DskipTests clean verify
+          - mvn -B -DskipTests clean verify
 
     - step: &upload-to-artifactory
         name: Upload to Artifactory
@@ -22,6 +21,7 @@ definitions:
           - bash create-settings.sh
           # Skip tests as there are lots of test failures in Apache Tika project
           - mvn -B -s settings.xml -DskipTests clean deploy
+          - mvn -B -s settings.xml release:clean release:prepare
 
 pipelines:
   branches:
