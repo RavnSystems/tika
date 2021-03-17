@@ -11,17 +11,19 @@ definitions:
           - maven
         script:
           # Skip tests as there are lots of test failures in Apache Tika project
-          - mvn -B -DskipTests clean verify
+          - mvn -B -Dmaven.test.skip=true clean verify
 
     - step: &upload-to-artifactory
         name: Upload to Artifactory
         caches:
           - maven
         script:
+          - echo $PIPELINE_PRIVATE_KEY | base64 -d > ~/.ssh/id_rsa
+          - chmod 600 ~/.ssh/id_rsa
           - bash create-settings.sh
-          # Skip tests as there are lots of test failures in Apache Tika project
-          - mvn -B -s settings.xml -DskipTests clean deploy
-          - mvn -B -s settings.xml release:clean release:prepare
+          - export JIRA_ISSUE_KEY=`git log -1 --pretty=%B | grep -e '[A-Z]\+-[0-9]\+' -o | sort -u | head -n 1`
+          - export MAVEN_COMMENT="[skip ci] Releasing ${JIRA_ISSUE_KEY}"
+          - mvn -B -s settings.xml -Dmaven.test.skip=true "-DscmCommentPrefix=$MAVEN_COMMENT" release:clean release:prepare release:perform
 
 pipelines:
   branches:

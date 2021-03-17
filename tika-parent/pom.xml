@@ -466,7 +466,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven.surefire.version}</version> <!-- versions greater than this don't like System.exit calls in tika-batch -->
         <configuration>
-          <testFailureIgnore>true</testFailureIgnore>
           <argLine>-Xmx3072m -Duser.timezone=UTC -Djava.awt.headless=true</argLine>
         </configuration>
       </plugin>
@@ -556,7 +555,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <testFailureIgnore>true</testFailureIgnore>
               <excludes>
                 <exclude>**/ForkParser*Test.java</exclude>
               </excludes>
