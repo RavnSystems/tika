@@ -235,6 +235,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.failsafe.version}</version>
                 <configuration>
+                    <skipITs>true</skipITs>
                     <additionalClasspathElements>
                         <additionalClasspathElement>
                             ${project.build.directory}/${project.build.finalName}.jar

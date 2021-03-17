@@ -593,6 +593,7 @@
           </execution>
         </executions>
         <configuration>
+          <skipITs>true</skipITs>
           <additionalClasspathElements>
           	<additionalClasspathElement>${project.build.directory}/test-bundles/jdk9plus</additionalClasspathElement>
           </additionalClasspathElements>
