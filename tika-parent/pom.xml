@@ -584,23 +584,26 @@
   </profiles>
 
   <scm>
-    <connection>scm:git:https://github.com/apache/</connection>
-    <developerConnection>scm:git:https://github.com/apache/</developerConnection>
-    <url>https://github.com/apache/tika</url>
+    <connection>scm:git:ssh://git@bitbucket.org/imanagedev/tika.git</connection>
+    <developerConnection>scm:git:ssh://git@bitbucket.org/imanagedev/tika.git</developerConnection>
+    <url>https://bitbucket.org/imanagedev/tika/</url>
     <tag>1.25-rc2</tag>
   </scm>
 
-  <!-- RAVN: distribution config -->
   <distributionManagement>
+    <downloadUrl>https://artifactory.imanage.com/artifactory/</downloadUrl>
     <repository>
-      <id>artifactory.ravn.imanage.com</id>
-      <name>artifactory.ravn.imanage.com-releases</name>
-      <url>https://artifactory.ravn.imanage.com/artifactory/libs-releases-local</url>
+      <uniqueVersion>false</uniqueVersion>
+      <id>artifactory.imanage.com</id>
+      <name>iManage RAVN Release Repositories</name>
+      <url>https://artifactory.imanage.com/artifactory/libs-releases-local/</url>
     </repository>
+
     <snapshotRepository>
-      <id>artifactory.ravn.imanage.com</id>
-      <name>artifactory.ravn.imanage.com-snapshots</name>
-      <url>https://artifactory.ravn.imanage.com/artifactory/libs-snapshots-local</url>
+      <uniqueVersion>true</uniqueVersion>
+      <id>artifactory.imanage.com</id>
+      <name>iManage RAVN Snapshots Repositories</name>
+      <url>https://artifactory.imanage.com/artifactory/libs-snapshots-local/</url>
     </snapshotRepository>
   </distributionManagement>
 </project>

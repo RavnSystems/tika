@@ -2,32 +2,31 @@ image:
   name: docker.imanage.com/ravn-java11-maven-base:latest
   username: $ARTIFACTORY_USERNAME
   password: $ARTIFACTORY_PASSPHRASE
+
 definitions:
   steps:
-    - step: &maven-install
-        name: Maven install
+    - step: &maven-verify
+        name: Maven Verify
         caches:
           - maven
         script:
+          - bash create-settings.sh
           # Skip tests as there are lots of test failures in Apache Tika project
-          - mvn clean install -DskipTests
+          - mvn -B -s settings.xml -DskipTests clean verify
+
     - step: &upload-to-artifactory
         name: Upload to Artifactory
         caches:
           - maven
         script:
-          - pipe: JfrogDev/artifactory-maven:0.3.3
-            variables:
-              ARTIFACTORY_URL: $SECURE_ARTIFACTORY_URL
-              ARTIFACTORY_USER: $ARTIFACTORY_USERNAME
-              ARTIFACTORY_PASSWORD: $ARTIFACTORY_PASSPHRASE
-              MAVEN_SNAPSHOT_REPO: "libs-snapshots-local"
-              MAVEN_RELEASE_REPO: "libs-releases-local"
-              MAVEN_COMMAND: "clean install -DskipTests"
+          - bash create-settings.sh
+          # Skip tests as there are lots of test failures in Apache Tika project
+          - mvn -B -s settings.xml -DskipTests clean deploy
+
 pipelines:
   branches:
     master:
       - step: *upload-to-artifactory
   pull-requests:
     '**':
-      - step: *maven-install
+      - step: *maven-verify
