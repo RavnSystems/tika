@@ -1,0 +1,33 @@
+image:
+  name: docker.imanage.com/ravn-java11-maven-base:latest
+  username: $ARTIFACTORY_USERNAME
+  password: $ARTIFACTORY_PASSPHRASE
+definitions:
+  steps:
+    - step: &maven-install
+        name: Maven install
+        caches:
+          - maven
+        script:
+          # Skip tests as there are lots of test failures in Apache Tika project
+          - mvn clean install -DskipTests
+    - step: &upload-to-artifactory
+        name: Upload to Artifactory
+        caches:
+          - maven
+        script:
+          - pipe: JfrogDev/artifactory-maven:0.3.3
+            variables:
+              ARTIFACTORY_URL: $SECURE_ARTIFACTORY_URL
+              ARTIFACTORY_USER: $ARTIFACTORY_USERNAME
+              ARTIFACTORY_PASSWORD: $ARTIFACTORY_PASSPHRASE
+              MAVEN_SNAPSHOT_REPO: "libs-snapshots-local"
+              MAVEN_RELEASE_REPO: "libs-releases-local"
+              MAVEN_COMMAND: "clean install -DskipTests"
+pipelines:
+  branches:
+    master:
+      - step: *upload-to-artifactory
+  pull-requests:
+    '**':
+      - step: *maven-install
