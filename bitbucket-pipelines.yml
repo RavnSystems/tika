@@ -23,7 +23,7 @@ definitions:
           - bash create-settings.sh
           - export JIRA_ISSUE_KEY=`git log -1 --pretty=%B | grep -e '[A-Z]\+-[0-9]\+' -o | sort -u | head -n 1`
           - export MAVEN_COMMENT="[skip ci] Releasing ${JIRA_ISSUE_KEY}"
-          - mvn -B -s settings.xml -Dmaven.test.skip=true "-DscmCommentPrefix=$MAVEN_COMMENT" release:clean release:prepare release:perform
+          - mvn -B -s settings.xml -DskipTests -DskipITs "-DscmCommentPrefix=$MAVEN_COMMENT" release:clean release:prepare release:perform
 
 pipelines:
   branches:
