@@ -587,7 +587,7 @@
     <connection>scm:git:ssh://git@bitbucket.org/imanagedev/tika.git</connection>
     <developerConnection>scm:git:ssh://git@bitbucket.org/imanagedev/tika.git</developerConnection>
     <url>https://bitbucket.org/imanagedev/tika/</url>
-    <tag>1.25-rc2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
